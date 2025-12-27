@@ -5,23 +5,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 1. Исправленный этап скачивания (без фильтров по веткам)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Установка компилятора
-      - name: Install Cross-Compiler
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-mips-linux-gnu
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.11.0
 
-      # 3. Компиляция (Статический бинарник для работы на любой прошивке)
-      - name: Compile youtubeUnblock
+      - name: Compile with Zig
         run: |
-          mips-linux-gnu-gcc -static -O3 -msoft-float src/*.c -o youtubeUnblock_wdr3500 -lpthread
-          mips-linux-gnu-strip youtubeUnblock_wdr3500
+          # Собираем только пользовательское приложение (пропуская kytunblock.c)
+          # mips-linux-musl: Big Endian (WDR3500)
+          # cpu-mips32r2: архитектура AR9344
+          zig cc -target mips-linux-musl -mcpu=mips32r2 -O3 \
+          src/args.c src/getopt.c src/inet_ntop.c src/mangle.c src/quic.c \
+          src/quic_crypto.c src/tls.c src/trie.c src/utils.c src/youtubeUnblock.c \
+          -o youtubeUnblock_wdr3500 -lpthread
 
-      # 4. Сохранение результата
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
