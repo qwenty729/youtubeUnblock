@@ -1,0 +1,34 @@
+name: Build for TP-Link WDR3500
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Cross-Compiler
+        run: |
+          sudo apt-get update
+          # Устанавливаем кросс-компилятор для MIPS (Big Endian)
+          sudo apt-get install -y gcc-mips-linux-gnu
+
+      - name: Compile youtubeUnblock
+        run: |
+          # Используем mips-linux-gnu-gcc
+          # -static: чтобы файл не зависел от библиотек роутера
+          # -O3: максимальная оптимизация по скорости
+          # -msoft-float: так как у AR9344 нет аппаратного FPU
+          mips-linux-gnu-gcc -static -O3 -msoft-float src/*.c -o youtubeUnblock_wdr3500 -lpthread
+
+      - name: Strip binary
+        run: |
+          # Удаляем отладочную информацию для уменьшения размера файла
+          mips-linux-gnu-strip youtubeUnblock_wdr3500
+
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtubeUnblock-wdr3500-binary
+          path: youtubeUnblock_wdr3500
