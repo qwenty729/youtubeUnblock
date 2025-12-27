@@ -5,30 +5,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install Cross-Compiler
+      - uses: actions/checkout@v4
+      - name: Install Compiler
+        run: sudo apt-get update && sudo apt-get install -y gcc-mips-linux-gnu
+      - name: Build Static Binary
         run: |
-          sudo apt-get update
-          # Устанавливаем кросс-компилятор для MIPS (Big Endian)
-          sudo apt-get install -y gcc-mips-linux-gnu
-
-      - name: Compile youtubeUnblock
-        run: |
-          # Используем mips-linux-gnu-gcc
-          # -static: чтобы файл не зависел от библиотек роутера
-          # -O3: максимальная оптимизация по скорости
-          # -msoft-float: так как у AR9344 нет аппаратного FPU
-          mips-linux-gnu-gcc -static -O3 -msoft-float src/*.c -o youtubeUnblock_wdr3500 -lpthread
-
-      - name: Strip binary
-        run: |
-          # Удаляем отладочную информацию для уменьшения размера файла
-          mips-linux-gnu-strip youtubeUnblock_wdr3500
-
-      - name: Upload result
+          # Собираем СТАТИЧЕСКИЙ файл. Он будет работать на ЛЮБОЙ версии OpenWrt, 
+          # так как не зависит от системных библиотек версии 23.05.
+          mips-linux-gnu-gcc -static -O3 -msoft-float src/*.c -o youtubeUnblock_mips_static -lpthread
+          mips-linux-gnu-strip youtubeUnblock_mips_static
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: youtubeUnblock-wdr3500-binary
-          path: youtubeUnblock_wdr3500
+          name: youtubeUnblock-WDR3500
+          path: youtubeUnblock_mips_static
+
