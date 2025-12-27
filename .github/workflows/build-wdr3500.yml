@@ -5,19 +5,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Compiler
-        run: sudo apt-get update && sudo apt-get install -y gcc-mips-linux-gnu
-      - name: Build Static Binary
+      # 1. Исправленный этап скачивания (без фильтров по веткам)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Установка компилятора
+      - name: Install Cross-Compiler
         run: |
-          # Собираем СТАТИЧЕСКИЙ файл. Он будет работать на ЛЮБОЙ версии OpenWrt, 
-          # так как не зависит от системных библиотек версии 23.05.
-          mips-linux-gnu-gcc -static -O3 -msoft-float src/*.c -o youtubeUnblock_mips_static -lpthread
-          mips-linux-gnu-strip youtubeUnblock_mips_static
-      - name: Upload
+          sudo apt-get update
+          sudo apt-get install -y gcc-mips-linux-gnu
+
+      # 3. Компиляция (Статический бинарник для работы на любой прошивке)
+      - name: Compile youtubeUnblock
+        run: |
+          mips-linux-gnu-gcc -static -O3 -msoft-float src/*.c -o youtubeUnblock_wdr3500 -lpthread
+          mips-linux-gnu-strip youtubeUnblock_wdr3500
+
+      # 4. Сохранение результата
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: youtubeUnblock-WDR3500
-          path: youtubeUnblock_mips_static
-
-
+          path: youtubeUnblock_wdr3500
