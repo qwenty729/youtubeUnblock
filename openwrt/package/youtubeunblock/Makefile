@@ -17,28 +17,27 @@ define Package/youtubeunblock
   SECTION:=net
   CATEGORY:=Network
   TITLE:=YouTube DPI bypass tool
-  URL:=https://github.com/Waujito/youtubeUnblock
   DEPENDS:=+libpthread +libnetfilter-queue
 endef
 
 define Package/youtubeunblock/description
-DPI bypass for YouTube on OpenWrt using NFQUEUE
+DPI bypass for YouTube using NFQUEUE
 endef
 
 define Build/Compile
-	$(TARGET_CC) $(TARGET_CFLAGS) \
-		$(TARGET_LDFLAGS) \
-		-o $(PKG_BUILD_DIR)/youtubeunblock \
-		$(PKG_BUILD_DIR)/youtubeUnblock.c \
-		-lnetfilter_queue -lpthread
+	$(MAKE) -C $(PKG_BUILD_DIR) \
+		CC="$(TARGET_CC)" \
+		CFLAGS="$(TARGET_CFLAGS)" \
+		LDFLAGS="$(TARGET_LDFLAGS)"
 endef
 
 define Package/youtubeunblock/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/youtubeunblock $(1)/usr/bin/youtubeunblock
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/youtubeUnblock $(1)/usr/bin/youtubeunblock
 
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init.d/youtubeUnblock $(1)/etc/init.d/youtubeunblock
 endef
 
 $(eval $(call BuildPackage,youtubeunblock))
+
