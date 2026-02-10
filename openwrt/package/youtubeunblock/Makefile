@@ -33,7 +33,8 @@ endef
 
 define Package/youtubeunblock/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/youtubeUnblock $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/youtubeUnblock $(1)/usr/bin/youtubeunblock
+
 
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init.d/youtubeUnblock $(1)/etc/init.d/youtubeunblock
