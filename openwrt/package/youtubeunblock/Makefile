@@ -28,7 +28,7 @@ define Package/youtubeunblock/description
 endef
 
 define Build/Compile
-	$(MAKE) -C $(PKG_BUILD_DIR)
+	true
 endef
 
 define Package/youtubeunblock/install
